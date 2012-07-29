@@ -40,6 +40,29 @@ def all_patterns(states, K, pattern=None):
         ret += all_patterns(cptail, K, cp)
     return ret
 
+ 
+def dict2func(dic):
+    return lambda k: dic[k]
+        
+
+def create_S(states, K, pattern=None):
+    from copy import copy
+    
+    if pattern is None:
+        pattern = dict()
+    if len(states) == 0:
+        return {dict2func(pattern)}
+
+    ret = set()
+    head = states.pop()
+    tail = states
+    for n in range(-1, K+2):
+        cp = copy(pattern)
+        cptail = copy(tail)
+        cp[head] = n
+        ret.update(create_Ss(cptail, K, cp))
+    return ret
+
 
 def succ(F, sigma, delta, alpha, Q, K):
     def _in_(q, alpha):
