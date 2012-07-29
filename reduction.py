@@ -51,9 +51,7 @@ def succ(F, sigma, delta, alpha, Q, K):
             return 1
         else:
             return 0
-    map = {}
-    for q in Q:
-        map[q] = -1
+    map = {q: -1 for q in Q}
     
     for p, s, q in [(p, s, q) for (p, s, q) in delta
                          if s == sigma and F(p) != -1]:
