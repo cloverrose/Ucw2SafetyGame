@@ -69,16 +69,14 @@ def succ_2to1(F, sigma, A, K):
     return succ(F, sigma, A.delta_I, A.alpha, A.Q_O, K)
 
 
-def _calc_gamma(delta, F, A, succ, K):
-    ret = set()
-    for (p, s, q) in delta:
-        if F(p) <= K and succ(F, s, A, K)[q] <= K:
-            ret.add(s)
-    return ret
-
-
 def calc_gamma(A, K):
-    return lambda F: _calc_gamma(A.delta_O, F, A, succ_1to2, K)
+    def inner(F):
+        ret = set()
+        for (p, s, q) in A.delta_O:
+            if F(p) <= K and succ_1to2(F, s, A, K)[q] <= K:
+                ret.add(s)
+        return ret
+    return lambda F: inner(F)
 
 
 class Game(object):
