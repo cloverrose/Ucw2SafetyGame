@@ -56,8 +56,8 @@ def succ(F, sigma, delta, alpha, Q, K):
         map[q] = -1
     
     for p, s, q in [(p, s, q) for (p, s, q) in delta
-                         if s == sigma and F[p] != -1]:
-        m = min(K + 1, F[p] + _in_(q, alpha))
+                         if s == sigma and F(p) != -1]:
+        m = min(K + 1, F(p) + _in_(q, alpha))
         if q in map:
             map[q] = max(map[q], m)
         else:
@@ -77,7 +77,7 @@ def succ_2to1(F, sigma, A, K):
 def _calc_gamma(delta, F, A, succ, K):
     ret = set()
     for (p, s, q) in delta:
-        if F[p] <= K and succ(F, s, A, K)[q] <= K:
+        if F(p) <= K and succ(F, s, A, K)[q] <= K:
             ret.add(s)
     return ret
 
