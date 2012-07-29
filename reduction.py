@@ -41,7 +41,7 @@ def create_S(states, K, pattern=None):
         cp = copy(pattern)
         cptail = copy(tail)
         cp[head] = n
-        ret.update(create_Ss(cptail, K, cp))
+        ret.update(create_S(cptail, K, cp))
     return ret
 
 
@@ -79,6 +79,18 @@ def calc_gamma(A, K):
     return lambda F: inner(F)
 
 
+def calc_F_0(S_1, Q_O, Q_ini, alpha):
+    F_0 = set()
+    for F in S_1:
+        for q in Q_O:
+            if not ((q not in Q_ini and F(q) == -1) or
+                    (q in Q_ini and q not in alpha and F(q) == 0) or
+                    (q in Q_ini and q in alpha and F(q) == 1)):
+                break
+        else:
+            F_0.add(F)
+    return F_0
+
 class Game(object):
     def __init__(self):
         self.Moves_1 = set()
@@ -91,9 +103,10 @@ class Game(object):
 
 
 def G(A, K):
+    from copy import copy
     g = Game()
-    g.S_1 = create_S(A.Q_O, K)
-    g.S_2 = create_S(A.Q_I, K)
+    g.S_1 = create_S(copy(A.Q_O), K)
+    g.S_2 = create_S(copy(A.Q_I), K)
     g.Moves_1 = A.Sigma_O
     g.Moves_2 = A.Sigma_I
     g.Gamma_1 = calc_gamma(A, K)
