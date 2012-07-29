@@ -58,10 +58,7 @@ def succ(F, sigma, delta, alpha, Q, K):
     for p, s, q in [(p, s, q) for (p, s, q) in delta
                          if s == sigma and F(p) != -1]:
         m = min(K + 1, F(p) + _in_(q, alpha))
-        if q in map:
-            map[q] = max(map[q], m)
-        else:
-            map[q] = m
+        map[q] = max(map[q], m)
 
     return map
 
