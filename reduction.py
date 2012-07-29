@@ -22,25 +22,6 @@ class UCW(object):
 
 
 
-def all_patterns(states, K, pattern=None):
-    from copy import copy
-    
-    if pattern is None:
-        pattern = dict()
-    if len(states) == 0:
-        return [pattern]
-
-    ret = []
-    head = states.pop()
-    tail = states
-    for n in range(-1, K+2):
-        cp = copy(pattern)
-        cptail = copy(tail)
-        cp[head] = n
-        ret += all_patterns(cptail, K, cp)
-    return ret
-
- 
 def dict2func(dic):
     return lambda k: dic[k]
         
@@ -118,8 +99,8 @@ class Game(object):
 
 def G(A, K):
     g = Game()
-    g.S_1 = all_patterns(A.Q_O, K)
-    g.S_2 = all_patterns(A.Q_I, K)
+    g.S_1 = create_S(A.Q_O, K)
+    g.S_2 = create_S(A.Q_I, K)
     g.Moves_1 = A.Sigma_O
     g.Moves_2 = A.Sigma_I
     g.Gamma_1 = calc_gamma(A, K)
