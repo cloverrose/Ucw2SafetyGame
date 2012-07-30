@@ -58,7 +58,7 @@ def succ(F, sigma, delta, alpha, Q, K):
         m = min(K + 1, F(p) + _in_(q, alpha))
         map[q] = max(map[q], m)
 
-    return map
+    return dict2func(map)
 
 
 def succ_1to2(F, sigma, A, K):
@@ -73,7 +73,7 @@ def calc_gamma(A, K):
     def inner(F):
         ret = set()
         for (p, s, q) in A.delta_O:
-            if F(p) <= K and succ_1to2(F, s, A, K)[q] <= K:
+            if F(p) <= K and succ_1to2(F, s, A, K)(q) <= K:
                 ret.add(s)
         return ret
     return lambda F: inner(F)
@@ -113,3 +113,28 @@ def G(A, K):
     g.Delta_1 = lambda F, sigma: succ_1to2(F, sigma, A, K)
     g.Delta_2 = lambda F, sigma: succ_2to1(F, sigma, A, K)
     return g
+
+
+def convert(A, K):
+    g = G(A, K)
+    F_0 = calc_F_0(g.S_1, A.Q_O, A.Q_ini, A.alpha)
+    for f_0 in F_0:
+        print '-' * 20
+        for q in A.Q_O:
+            counter = f_0(q)
+            if counter != -1:
+                print '({0}, {1})'.format(q, f_0(q)),
+        print ''
+        print '-' * 20
+        sigmas = g.Gamma_1(f_0)
+        for s in sigmas:
+            print s
+            next = g.Delta_1(f_0, s)
+            print '-' * 20
+            for q in A.Q_I:
+                counter = next(q)
+                if counter != -1:
+                    print '({0}, {1})'.format(q, next(q)),
+            print ''
+            print '-' * 20
+            
