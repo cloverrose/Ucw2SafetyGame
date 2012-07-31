@@ -115,26 +115,19 @@ def G(A, K):
     return g
 
 
+def print_position(F, Q):
+    print '-' * 20
+    print ', '.join(['({0}, {1})'.format(q, F(q)) for q in Q if F(q) != -1])
+    print '-' * 20
+
+
 def convert(A, K):
     g = G(A, K)
     F_0 = calc_F_0(g.S_1, A.Q_O, A.Q_ini, A.alpha)
     for f_0 in F_0:
-        print '-' * 20
-        for q in A.Q_O:
-            counter = f_0(q)
-            if counter != -1:
-                print '({0}, {1})'.format(q, f_0(q)),
-        print ''
-        print '-' * 20
+        print_position(f_0, A.Q_O)
         sigmas = g.Gamma_1(f_0)
         for s in sigmas:
             print s
             next = g.Delta_1(f_0, s)
-            print '-' * 20
-            for q in A.Q_I:
-                counter = next(q)
-                if counter != -1:
-                    print '({0}, {1})'.format(q, next(q)),
-            print ''
-            print '-' * 20
-            
+            print_position(next, A.Q_I)
