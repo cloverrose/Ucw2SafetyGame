@@ -91,6 +91,7 @@ def calc_F_0(S_1, Q_O, Q_ini, alpha):
             F_0.add(F)
     return F_0
 
+
 class Game(object):
     def __init__(self):
         self.Moves_1 = set()
@@ -115,19 +116,35 @@ def G(A, K):
     return g
 
 
-def print_position(F, Q):
-    print '-' * 20
-    print ', '.join(['({0}, {1})'.format(q, F(q)) for q in Q if F(q) != -1])
-    print '-' * 20
+def tostring_F(F, Q):
+    return ', '.join(['({0}, {1})'.format(q, F(q)) for q in Q if F(q) != -1])
 
+    
+def convert_iter(G, F, Q_I, Q_O, turn, visited):
+    if turn == 1:
+        Q = Q_O
+        next_turn = 2
+        sigmas = G.Gamma_1(F)
+        Delta = G.Delta_1
+    else:
+        Q = Q_I
+        next_turn = 1
+        sigmas = G.Moves_2
+        Delta = G.Delta_2
+    string_F = tostring_F(F, Q)
+    print string_F
+    if string_F in visited:
+        return
+    visited.add(string_F)
+    for s in sigmas:
+        print s
+        next = Delta(F, s)
+        convert_iter(G, next, Q_I, Q_O, next_turn, visited)
+    
 
 def convert(A, K):
     g = G(A, K)
     F_0 = calc_F_0(g.S_1, A.Q_O, A.Q_ini, A.alpha)
     for f_0 in F_0:
-        print_position(f_0, A.Q_O)
-        sigmas = g.Gamma_1(f_0)
-        for s in sigmas:
-            print s
-            next = g.Delta_1(f_0, s)
-            print_position(next, A.Q_I)
+        visited = set()
+        convert_iter(g, f_0, A.Q_I, A.Q_O, 1, visited)
