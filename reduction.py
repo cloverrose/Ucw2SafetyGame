@@ -1,5 +1,7 @@
 # -*- coding:utf-8 -*-
 
+import pygraphviz as pgv
+
 
 class UCW(object):
     def __init__(self):
@@ -120,31 +122,54 @@ def tostring_F(F, Q):
     return ', '.join(['({0}, {1})'.format(q, F(q)) for q in Q if F(q) != -1])
 
     
-def convert_iter(G, F, Q_I, Q_O, turn, visited):
+def convert_iter(G, F, Q_I, Q_O, turn, visited, graph):
     if turn == 1:
         Q = Q_O
+        Q_next = Q_I
         next_turn = 2
         sigmas = G.Gamma_1(F)
         Delta = G.Delta_1
+        node_shape = 'ellipse'
+        node_shape_next = 'box'
     else:
         Q = Q_I
+        Q_next = Q_O
         next_turn = 1
         sigmas = G.Moves_2
         Delta = G.Delta_2
+        node_shape = 'box'
+        node_shape_next = 'ellipse'
+
     string_F = tostring_F(F, Q)
-    print string_F
     if string_F in visited:
         return
     visited.add(string_F)
+    graph.add_node(string_F, shape=node_shape)
     for s in sigmas:
-        print s
-        next = Delta(F, s)
-        convert_iter(G, next, Q_I, Q_O, next_turn, visited)
-    
+        F_next = Delta(F, s)
+        string_F_next = tostring_F(F_next, Q_next)
+        graph.add_node(string_F_next, shape=node_shape_next)
+        edge = find_edge(graph, string_F, string_F_next)
+        if edge is not None:
+            label = edge.attr['label']
+            s = ', '.join([s, label])
+        graph.add_edge(string_F, string_F_next, label=s, dir='forward')
+        convert_iter(G, F_next, Q_I, Q_O, next_turn, visited, graph)
+
+def find_edge(graph, start, end):
+    if graph.has_edge(start, end):
+        for edge in graph.edges_iter(start):
+            if edge[1] == end:
+                return edge
+    return None    
 
 def convert(A, K):
+    graph = pgv.AGraph(directed=True)
     g = G(A, K)
     F_0 = calc_F_0(g.S_1, A.Q_O, A.Q_ini, A.alpha)
     for f_0 in F_0:
         visited = set()
-        convert_iter(g, f_0, A.Q_I, A.Q_O, 1, visited)
+        convert_iter(g, f_0, A.Q_I, A.Q_O, 1, visited, graph)
+    graph.layout(prog='dot')
+    graph.draw('ret.png')
+    return graph
